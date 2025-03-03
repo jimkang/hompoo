@@ -8,4 +8,4 @@
 /// @DnDArgument : "var" "y"
 /// @DnDArgument : "var_1" "spr_index"
 y += +move_rate;
-spr_index = spr_link_down;
+spr_index = spr_hompoo_down;

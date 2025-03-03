@@ -1,10 +1,13 @@
 {
   "$GMObject":"",
-  "%Name":"obj_rock_a",
+  "%Name":"obj_garbage",
   "eventList":[],
   "managed":true,
-  "name":"obj_rock_a",
-  "overriddenProperties":[],
+  "name":"obj_garbage",
+  "overriddenProperties":[
+    {"$GMOverriddenProperty":"v1","%Name":"","name":"","objectId":{"name":"obj_collision_parent","path":"objects/obj_collision_parent/obj_collision_parent.yy",},"propertyId":{"name":"pushable","path":"objects/obj_collision_parent/obj_collision_parent.yy",},"resourceType":"GMOverriddenProperty","resourceVersion":"2.0","value":"True",},
+    {"$GMOverriddenProperty":"v1","%Name":"","name":"","objectId":{"name":"obj_collision_parent","path":"objects/obj_collision_parent/obj_collision_parent.yy",},"propertyId":{"name":"is_item","path":"objects/obj_collision_parent/obj_collision_parent.yy",},"resourceType":"GMOverriddenProperty","resourceVersion":"2.0","value":"False",},
+  ],
   "parent":{
     "name":"Objects",
     "path":"folders/Objects.yy",
@@ -36,8 +39,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_wall",
-    "path":"sprites/spr_wall/spr_wall.yy",
+    "name":"garbage",
+    "path":"sprites/garbage/garbage.yy",
   },
   "spriteMaskId":null,
   "visible":true,

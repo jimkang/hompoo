@@ -1,5 +1,5 @@
 move_rate = 4
-spr_index = spr_link_down
+spr_index = spr_hompoo_down
 
 self.bag = []
 self.wants_types = ["word"];

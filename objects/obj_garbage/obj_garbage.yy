@@ -39,8 +39,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"garbage",
-    "path":"sprites/garbage/garbage.yy",
+    "name":"spr_garbage",
+    "path":"sprites/spr_garbage/spr_garbage.yy",
   },
   "spriteMaskId":null,
   "visible":true,

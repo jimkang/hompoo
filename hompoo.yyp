@@ -55,6 +55,7 @@
     {"id":{"name":"scr_init","path":"scripts/scr_init/scr_init.yy",},},
     {"id":{"name":"scr_item","path":"scripts/scr_item/scr_item.yy",},},
     {"id":{"name":"scr_map_gen","path":"scripts/scr_map_gen/scr_map_gen.yy",},},
+    {"id":{"name":"scr_unique_array","path":"scripts/scr_unique_array/scr_unique_array.yy",},},
     {"id":{"name":"spr_dancer","path":"sprites/spr_dancer/spr_dancer.yy",},},
     {"id":{"name":"spr_ear","path":"sprites/spr_ear/spr_ear.yy",},},
     {"id":{"name":"spr_food","path":"sprites/spr_food/spr_food.yy",},},

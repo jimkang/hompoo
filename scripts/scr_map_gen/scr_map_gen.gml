@@ -284,7 +284,6 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 	for (var i = 0; i < 10; ++i) {
 		var valid_dir_names = array_shuffle(struct_get_names(global.cardinal_dirs_by_name));
 		var dir_name = undefined;
-
 		
 		// This loop tries to generate a chamber that is valid and does not collide
 		// with anything.
@@ -301,22 +300,25 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 				anchor_pack = get_anchors_for_direction(chamber, dir_name);
 			}
 		
-			chamber = generate_chamber(dir_x, dir_y,
+			var new_chamber = generate_chamber(dir_x, dir_y,
 				map_width_in_tiles, map_height_in_tiles,
 				anchor_pack);
 
 			var chamber_collides = false;
 
-			if (chamber == undefined) {
+			if (new_chamber == undefined) {
 				show_debug_message("Could not make chamber at {0}, {1} going {2}, {3}.",
 					anchor_pack.anchor_x, anchor_pack.anchor_y, dir_x, dir_y);
 				continue;
 			}
 
-			if (chamber_collides_with_tiles(floor_tile_positions, chamber)) {
-				show_debug_message("Chamber collides with existing tiles. {0}", chamber);
+			if (chamber_collides_with_tiles(floor_tile_positions, new_chamber)) {
+				show_debug_message("Chamber collides with existing tiles. {0}", new_chamber);
 				continue;
 			}
+			
+			// It is now OK to use this chamber as the basis for the next chamber.
+			chamber = new_chamber;
 			
 			if (chamber.left < global.max_chamber_width) {
 			    array_remove(valid_dir_names, "left");
@@ -341,14 +343,14 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 			continue;
 		}
 		
-		show_debug_message(
-			"Chamber created: left {0}, top {1}, width: {2}, height: {3} right {4}, bottom {5}, anchor: {6}, {7}, direction: {8}, {9}",
-			chamber.left, chamber.top, 
-			chamber.width, chamber.height,
-			chamber.right, chamber.bottom,			
-			anchor_pack.anchor_x, anchor_pack.anchor_y,
-			dir_x, dir_y
-		);
+		//show_debug_message(
+		//	"Chamber created: left {0}, top {1}, width: {2}, height: {3} right {4}, bottom {5}, anchor: {6}, {7}, direction: {8}, {9}",
+		//	chamber.left, chamber.top, 
+		//	chamber.width, chamber.height,
+		//	chamber.right, chamber.bottom,			
+		//	anchor_pack.anchor_x, anchor_pack.anchor_y,
+		//	dir_x, dir_y
+		//);
 		show_debug_message(
 			"<g><rect x=\"{0}\" y=\"{1}\" width=\"{2}\" height=\"{3}\"></rect><text x=\"{4}\" y=\"{5}\" dy=\"1\">{6}</text><circle r=\"1\" cx=\"{7}\" cy=\"{8}\" ></g>",
 			chamber.left, chamber.top, 

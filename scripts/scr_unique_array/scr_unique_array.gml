@@ -16,6 +16,6 @@ function UniqueArray() constructor {
 	
 	static has = function(item) {
 		var hash = variable_get_hash(json_stringify(item));
-		return struct_exists_from_hash(dict, has);
+		return struct_exists_from_hash(dict, hash);
 	}
 }

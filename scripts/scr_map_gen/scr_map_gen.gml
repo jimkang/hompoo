@@ -16,6 +16,7 @@ global.opposite_wall_map = {
   "top": "bottom",
   "bottom": "top"
 };
+global.wall_names = struct_get_names(global.opposite_wall_map);
 
 function array_remove(array, value) {
   var index = array_get_index(array, value);
@@ -109,41 +110,45 @@ function chamber_collides_with_tiles(floor_tile_positions, chamber) {
 	return false;
 }
 
-function add_gaps_to_chamber(chamber, preset_gap_wall_name, preset_gap) {
+function create_gap(wall, chamber) {
+	var gap = {
+		length: choose(1, 1, 1, 2)
+	};
+
+	switch (wall) {
+		case "left":
+		case "right": {
+			gap.start = chamber.top + irandom(chamber.bottom - chamber.top - 1);
+			break;
+		}
+		case "top":
+		case "bottom": {
+			gap.start = chamber.left + irandom(chamber.right - chamber.left - 1);
+			break;
+		}
+	}
+	// stop is not inclusive.
+	gap.stop = gap.start + gap.length;
+	return gap;
+}
+
+function add_gaps_to_chamber(chamber, required_gap_wall_name, required_gap) {
 	chamber.gaps = {};
 
 	var gap_count = choose(1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
 	var walls = [];
-	array_copy(walls, 0, array_shuffle(["left", "right", "top", "bottom"]),
+	array_copy(walls, 0, array_shuffle(global.wall_names),
 		0, gap_count);
 
 	for (var i = 0; i < gap_count; ++i) {
 		var wall = walls[i];
 
-	    if (wall == preset_gap_wall_name) {
-	      chamber.gaps[$ wall] = preset_gap;
+	    if (wall == required_gap_wall_name) {
+	      chamber.gaps[$ wall] = required_gap;
 	      continue;
 	    }
 
-		var gap = {
-			length: choose(1, 1, 1, 2)
-		};
-
-		switch (wall) {
-			case "left":
-			case "right": {
-				gap.start = chamber.top + irandom(chamber.bottom - chamber.top - 1);
-				break;
-			}
-			case "top":
-			case "bottom": {
-				gap.start = chamber.left + irandom(chamber.right - chamber.left - 1);
-				break;
-			}
-		}
-		// stop is not inclusive.
-		gap.stop = gap.start + gap.length;
-		chamber.gaps[$ wall] = gap;
+		chamber.gaps[$ wall] = create_gap(wall, chamber);
 	}
 }
 
@@ -217,7 +222,6 @@ function get_anchors_for_direction(chamber, dir_name) {
 	var anchor_x;
 	var anchor_y;
 	var anchor_wall_gap;
-	var anchor_wall_name;
 	
 	if (dir_x != 0) {
 		anchor_x = dir_x > 0 ? chamber.right : chamber.left;
@@ -245,6 +249,7 @@ function get_anchors_for_direction(chamber, dir_name) {
 	}
 
 	if (struct_exists(chamber.gaps, anchor_wall_name)) {
+		// We already have gaps in this wall, created by the previous chamber.
 		anchor_wall_gap = struct_get(chamber.gaps, anchor_wall_name);
 		anchor_wall_name = global.opposite_wall_map[$ anchor_wall_name];
 	} else {
@@ -352,13 +357,17 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 		//	dir_x, dir_y
 		//);
 		show_debug_message(
-			"<g><rect x=\"{0}\" y=\"{1}\" width=\"{2}\" height=\"{3}\" stroke=\"#{6}00\"></rect><text x=\"{4}\" y=\"{5}\" dx=\"1\" dy=\"1\">{6}</text><circle r=\"0.5\" cx=\"{7}\" cy=\"{8}\"></circle><text x=\"{4}\" y=\"{5}\" dx=\"1\" dy=\"3\">Dir: {9}, {10}</text></g>",
-			chamber.left, chamber.top, 
-			chamber.width, chamber.height,
-			chamber.left, chamber.top, 
-			array_length(chambers),
-			anchor_pack.anchor_x, anchor_pack.anchor_y,
-			dir_x, dir_y
+			$"<g>\n{
+			""
+	}	<rect x=\"{chamber.left}\" y=\"{chamber.top}\" width=\"{chamber.width}\" height=\"{chamber.height}\" stroke=\"#{array_length(chambers)}00\"></rect>\n{
+	""
+	}	<text x=\"{chamber.left}\" y=\"{chamber.top}\" dx=\"1\" dy=\"1\">{array_length(chambers)}</text>\n{
+	""
+	}	<circle r=\"0.5\" cx=\"{anchor_pack.anchor_x}\" cy=\"{anchor_pack.anchor_y}\"></circle>\n{
+	""
+	}	<text x=\"{chamber.left}\" y=\"{chamber.top}\" dx=\"1\" dy=\"3\">Dir: {dir_x}, {dir_y}</text>\n{
+	""
+	}</g>"
 		);
 
 		record_chamber_floor_tiles_positions(floor_tile_positions, chamber);

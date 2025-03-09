@@ -50,8 +50,6 @@ function draw_chamber(chamber, tile_map, floor_tile_data, anti_wall_list) {
 
 	var instances_layer = layer_get_id("Instances_1");
 
-	//var gap_walls = variable_struct_get_names(chamber.gaps);
-
 	for (var tileX = chamber.left; tileX <= chamber.right; ++tileX) {
 		// Top wall
 		if (!anti_wall_list.has([tileX, chamber.top])) {
@@ -134,8 +132,6 @@ function create_gap(wall, chamber) {
 
 // The gap wall assignments are wrong.
 function add_gaps_to_chamber(chamber, anti_wall_list) {
-	chamber.gaps = {};
-
 	var gap_count = choose(1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
 	var walls = [];
 	array_copy(walls, 0, array_shuffle(global.wall_names),
@@ -143,7 +139,6 @@ function add_gaps_to_chamber(chamber, anti_wall_list) {
 
 	for (var i = 0; i < gap_count; ++i) {
 		var wall = walls[i];
-
 		
 		var gap = create_gap(wall, chamber);
 		switch (wall) {
@@ -172,8 +167,6 @@ function add_gaps_to_chamber(chamber, anti_wall_list) {
 				break;
 			}
 		}
-		
-		chamber.gaps[$ wall] = gap;
 	}
 }
 
@@ -387,8 +380,6 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 	}	<circle r=\"0.5\" cx=\"{anchor_pack.anchor_x}\" cy=\"{anchor_pack.anchor_y}\"></circle>\n{
 	""
 	}	<text x=\"{chamber.left}\" y=\"{chamber.top}\" dx=\"1\" dy=\"3\">Dir: {dir_x}, {dir_y}</text>\n{
-	""
-	}  <!-- gaps:{json_stringify(chamber.gaps)}-->\n{
 	""
 	}</g>"
 		);

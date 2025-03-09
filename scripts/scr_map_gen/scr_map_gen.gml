@@ -133,26 +133,17 @@ function create_gap(wall, chamber) {
 }
 
 // The gap wall assignments are wrong.
-function add_gaps_to_chamber(chamber, required_gap_wall_name, required_gap, anti_wall_list) {
+function add_gaps_to_chamber(chamber, anti_wall_list) {
 	chamber.gaps = {};
 
 	var gap_count = choose(1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
 	var walls = [];
 	array_copy(walls, 0, array_shuffle(global.wall_names),
 		0, gap_count);
-	if (required_gap_wall_name != undefined &&
-		!array_contains(walls, required_gap_wall_name)) {
-		// Make sure the required gap gets in there, even if it's not in the random draw.
-		array_push(walls, required_gap_wall_name);
-	}
 
 	for (var i = 0; i < gap_count; ++i) {
 		var wall = walls[i];
 
-	    if (wall == required_gap_wall_name) {
-	      chamber.gaps[$ wall] = required_gap;
-	      continue;
-	    }
 		
 		var gap = create_gap(wall, chamber);
 		switch (wall) {
@@ -260,8 +251,7 @@ function generate_chamber(direction_x, direction_y,
 		return;
 	}
 
-	add_gaps_to_chamber(chamber, anchor_pack.anchor_wall_name, 
-		anchor_pack.anchor_wall_gap, anti_wall_list);
+	add_gaps_to_chamber(chamber, anti_wall_list);
 	return chamber;
 }
 
@@ -274,7 +264,6 @@ function get_anchors_for_direction(neighbor_chamber, dir_name) {
 	
 	var anchor_x;
 	var anchor_y;
-	var anchor_wall_gap;
 	
 	if (dir_x != 0) {
 		anchor_x = dir_x > 0 ? neighbor_chamber.right : neighbor_chamber.left;
@@ -291,31 +280,8 @@ function get_anchors_for_direction(neighbor_chamber, dir_name) {
 			anchor_x = round((neighbor_chamber.right - neighbor_chamber.left)/2);
 		}
 	}
-		
-	var anchor_wall_name = dir_name;
-		
-	if (dir_name == "up") {
-		anchor_wall_name = "top";
-	}
-	if (dir_name  == "down") {
-		anchor_wall_name = "bottom";
-	}
-
-	if (struct_exists(neighbor_chamber.gaps, anchor_wall_name)) {
-		// We already have gaps in this wall, created by neighbor_chamber,
-		// so we'll sat that they should be copied to the opposite wall in the
-		// current chamber.
-		// e.g. If the anchor wall in neighbor_chamber is the right wall, that 
-		// corresponds to the left wall in the current chamber. The gaps should
-		// be reproduced there.
-		anchor_wall_gap = struct_get(neighbor_chamber.gaps, anchor_wall_name);
-		anchor_wall_name = global.opposite_wall_map[$ anchor_wall_name];
-	} else {
-		anchor_wall_gap = undefined;
-		anchor_wall_name = undefined;
-	}
 	
-	return { anchor_x, anchor_y, anchor_wall_gap, anchor_wall_name };
+	return { anchor_x, anchor_y };
 }
 
 function generate_floor(map_width_in_tiles, map_height_in_tiles) {
@@ -335,13 +301,9 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 	var dir_y = undefined;
 
 	var chambers = [];
-	var anchor_wall_gap = undefined;
-	var anchor_wall_name = undefined;
 	var anchor_pack = {
 		anchor_x: floor(map_width_in_tiles/2),
 		anchor_y: floor(map_height_in_tiles/2),
-		anchor_wall_name: undefined,
-		anchor_wall_gap: undefined
 	};
 	var chamber = undefined;
 
@@ -444,8 +406,8 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 	// If you draw as you go, the anti_wall_list won't be complete.
 	// So, draw after all of the chambers are generated.	
 	for (var i = 0; i < array_length(chambers); ++i) {
-		var chamber = chambers[i];
-		draw_chamber(chamber, tile_map, floor_tile_data, anti_wall_list);
+		var chamber_to_draw = chambers[i];
+		draw_chamber(chamber_to_draw, tile_map, floor_tile_data, anti_wall_list);
 	}
 	
 	return { chambers: chambers, floor_tile_positions: floor_tile_positions };

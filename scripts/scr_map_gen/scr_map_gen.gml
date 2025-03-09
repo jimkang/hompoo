@@ -16,6 +16,12 @@ global.opposite_wall_map = {
   "top": "bottom",
   "bottom": "top"
 };
+global.dir_to_wall_name_map = {
+  "left": "left",
+  "right": "right",
+  "down": "bottom",
+  "up": "top"
+};
 global.wall_names = struct_get_names(global.opposite_wall_map);
 
 function array_remove(array, value) {
@@ -130,19 +136,40 @@ function create_gap(wall, chamber) {
 	return gap;
 }
 
-// The gap wall assignments are wrong.
-// Gaps need to be in the coincidence of two walls.// We shouldn't be adding to the list unless we're sure that the chamber will be accepted.
-function add_gaps_to_chamber(chamber) {
+function add_gaps_to_chamber(chamber, anchor_pack) {
 	var gap_count = choose(1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
 	var walls = [];
 	array_copy(walls, 0, array_shuffle(global.wall_names),
 		0, gap_count);
-
-	if (chamber.left == 0) {
-		show_debug_message("hey");
+	
+	// Make sure there is a gap at the anchor.
+	array_push(chamber.anti_walls, [anchor_pack.anchor_x, anchor_pack.anchor_y]);
+	if (chamber.growth_direction[0] != 0) {
+		// To the left of the anchor.
+		if (irandom(1) == 0) {
+			array_push(chamber.anti_walls, [anchor_pack.anchor_x - 1, anchor_pack.anchor_y]);
+		}
+		// To the right of the anchor.
+		if (irandom(1) == 0) {
+			array_push(chamber.anti_walls, [anchor_pack.anchor_x + 1, anchor_pack.anchor_y]);
+		}
+	} else if (chamber.growth_direction[1] != 0) {
+		// To the top of the anchor.
+		if (irandom(1) == 0) {
+			array_push(chamber.anti_walls, [anchor_pack.anchor_x, anchor_pack.anchor_y - 1]);
+		}
+		// To the bottom of the anchor.
+		if (irandom(1) == 0) {
+			array_push(chamber.anti_walls, [anchor_pack.anchor_x, anchor_pack.anchor_y + 1]);
+		}
 	}
+
 	for (var i = 0; i < gap_count; ++i) {
 		var wall = walls[i];
+		if (wall == anchor_pack.anchor_wall_name) {
+			// Already add gaps for this wall.
+			continue;
+		}
 		
 		var gap = create_gap(wall, chamber);
 		switch (wall) {
@@ -188,6 +215,7 @@ function generate_chamber(direction_x, direction_y,
 	var chamber = {
 		width: width,
 		height: height,
+		growth_direction: [direction_x, direction_y],
 		anti_walls: []
 	};
 
@@ -198,16 +226,8 @@ function generate_chamber(direction_x, direction_y,
 		chamber.right = anchor_pack.anchor_x;
 		chamber.left = chamber.right - width;
 	} else {
-		if (struct_exists(anchor_pack, "anchor_wall_gap") && anchor_pack.anchor_wall_gap) {
-			var center_of_anchor_wall_gap = 
-				round(anchor_pack.anchor_wall_gap.start +
-					(anchor_pack.anchor_wall_gap.length - 1)/2);
-		
-			chamber.left = round(center_of_anchor_wall_gap - height/2);
-		} else {
-			var center_of_anchor_wall = anchor_pack.anchor_x - round(width/2);
-			chamber.left = center_of_anchor_wall;			
-		}
+		var center_of_anchor_wall = anchor_pack.anchor_x - round(width/2);
+		chamber.left = center_of_anchor_wall;	
 		chamber.right = chamber.left + width;
 	}
 
@@ -218,17 +238,8 @@ function generate_chamber(direction_x, direction_y,
 		chamber.bottom = anchor_pack.anchor_y;
 		chamber.top = chamber.bottom - height;
 	} else {
-		if (struct_exists(anchor_pack, "anchor_wall_gap") && anchor_pack.anchor_wall_gap) {
-			var center_of_anchor_wall_gap = 
-				round(anchor_pack.anchor_wall_gap.start +
-					(anchor_pack.anchor_wall_gap.length - 1)/2);
-		
-			//anchor_y - round(height/2);
-			chamber.top = round(center_of_anchor_wall_gap - height/2);
-		} else {
-			var center_of_anchor_wall = anchor_pack.anchor_y - round(height/2);
-			chamber.top = center_of_anchor_wall;			
-		}		
+		var center_of_anchor_wall = anchor_pack.anchor_y - round(height/2);
+		chamber.top = center_of_anchor_wall;
 		chamber.bottom = chamber.top + height;
 	}
 
@@ -253,7 +264,7 @@ function generate_chamber(direction_x, direction_y,
 		return;
 	}
 
-	add_gaps_to_chamber(chamber);
+	add_gaps_to_chamber(chamber, anchor_pack);
 	return chamber;
 }
 
@@ -266,6 +277,7 @@ function get_anchors_for_direction(neighbor_chamber, dir_name) {
 	
 	var anchor_x;
 	var anchor_y;
+	var anchor_wall_name = global.opposite_wall_map[$ global.dir_to_wall_name_map[$ dir_name]];
 	
 	if (dir_x != 0) {
 		anchor_x = dir_x > 0 ? neighbor_chamber.right : neighbor_chamber.left;
@@ -283,7 +295,7 @@ function get_anchors_for_direction(neighbor_chamber, dir_name) {
 		}
 	}
 	
-	return { anchor_x, anchor_y };
+	return { anchor_x, anchor_y, anchor_wall_name };
 }
 
 function generate_floor(map_width_in_tiles, map_height_in_tiles) {
@@ -306,6 +318,7 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 	var anchor_pack = {
 		anchor_x: floor(map_width_in_tiles/2),
 		anchor_y: floor(map_height_in_tiles/2),
+		anchor_wall_name: array_choose(global.wall_names)
 	};
 	var chamber = undefined;
 

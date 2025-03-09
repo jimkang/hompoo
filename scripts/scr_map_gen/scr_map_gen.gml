@@ -41,17 +41,7 @@ function is_in_gap(gap, n) {
 	return n >= gap.start && n < gap.stop;
 }
 
-function is_ok_to_put_wall_here(chamber, side, pos_one_d) {
-    if (!struct_exists(chamber.gaps, side)) {
-      return true;
-    }
-    if (!is_in_gap(struct_get(chamber.gaps, side), pos_one_d)) {
-      return true;
-    }
-    return false;
-}
-
-function draw_chamber(chamber, tile_map, floor_tile_data) {
+function draw_chamber(chamber, tile_map, floor_tile_data, anti_wall_list) {
 	for (var tileX = chamber.left; tileX < chamber.right + 1; ++tileX) {
 		for (var tileY = chamber.top; tileY < chamber.bottom + 1; ++tileY) {
 			tilemap_set(tile_map, floor_tile_data, tileX, tileY);
@@ -64,27 +54,35 @@ function draw_chamber(chamber, tile_map, floor_tile_data) {
 
 	for (var tileX = chamber.left; tileX <= chamber.right; ++tileX) {
 		// Top wall
-		if (is_ok_to_put_wall_here(chamber, "top", tileX)) {
+		if (!anti_wall_list.has([tileX, chamber.top])) {
 			instance_create_layer(tileX * global.tile_size , chamber.top * global.tile_size ,
 				instances_layer, obj_rock_a);
+		} else {
+			show_debug_message($"Leaving {[tileX, chamber.top]} alone.");
 		}
 		// Bottom wall
-		if (is_ok_to_put_wall_here(chamber, "bottom", tileX)) {
+		if (!anti_wall_list.has([tileX, chamber.bottom])) {
 			instance_create_layer(tileX * global.tile_size, chamber.bottom * global.tile_size,
 				instances_layer, obj_rock_a);
+		} else {
+			show_debug_message($"Leaving {[tileX, chamber.bottom]} alone.");
 		}
 	}
 
 	for (var tileY = chamber.top; tileY <= chamber.bottom; ++tileY) {
 		// Left wall
-		if (is_ok_to_put_wall_here(chamber, "left", tileY)) {
+		if (!anti_wall_list.has([chamber.left, tileY])) {
 			instance_create_layer(chamber.left * global.tile_size , tileY * global.tile_size ,
 				instances_layer, obj_rock_a);
+		} else {
+			show_debug_message($"Leaving {[chamber.left, tileY]} alone.");
 		}
 		// Right wall
-		if (is_ok_to_put_wall_here(chamber, "right", tileY)) {
+		if (!anti_wall_list.has([chamber.right, tileY])) {
 			instance_create_layer(chamber.right * global.tile_size , tileY * global.tile_size ,
 				instances_layer, obj_rock_a);
+		} else {
+			show_debug_message($"Leaving {[chamber.right, tileY]} alone.");
 		}
 	}
 }
@@ -110,6 +108,8 @@ function chamber_collides_with_tiles(floor_tile_positions, chamber) {
 	return false;
 }
 
+// Gap positions need to be in absolute tile positions, not relative to the
+// chamber. This way, they can be transferred between chambers.
 function create_gap(wall, chamber) {
 	var gap = {
 		length: choose(1, 1, 1, 2)
@@ -132,13 +132,19 @@ function create_gap(wall, chamber) {
 	return gap;
 }
 
-function add_gaps_to_chamber(chamber, required_gap_wall_name, required_gap) {
+// The gap wall assignments are wrong.
+function add_gaps_to_chamber(chamber, required_gap_wall_name, required_gap, anti_wall_list) {
 	chamber.gaps = {};
 
 	var gap_count = choose(1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
 	var walls = [];
 	array_copy(walls, 0, array_shuffle(global.wall_names),
 		0, gap_count);
+	if (required_gap_wall_name != undefined &&
+		!array_contains(walls, required_gap_wall_name)) {
+		// Make sure the required gap gets in there, even if it's not in the random draw.
+		array_push(walls, required_gap_wall_name);
+	}
 
 	for (var i = 0; i < gap_count; ++i) {
 		var wall = walls[i];
@@ -147,13 +153,41 @@ function add_gaps_to_chamber(chamber, required_gap_wall_name, required_gap) {
 	      chamber.gaps[$ wall] = required_gap;
 	      continue;
 	    }
-
-		chamber.gaps[$ wall] = create_gap(wall, chamber);
+		
+		var gap = create_gap(wall, chamber);
+		switch (wall) {
+			case "left": {
+				for (var tileY = gap.start; tileY < gap.stop; ++tileY) {
+					anti_wall_list.add([chamber.left, tileY]);
+				}
+				break;
+			}
+			case "right": {
+				for (var tileY = gap.start; tileY < gap.stop; ++tileY) {
+					anti_wall_list.add([chamber.right, tileY]);
+				}
+				break;
+			}
+			case "top": {
+				for (var tileX = gap.start; tileX < gap.stop; ++tileX) {
+					anti_wall_list.add([tileX, chamber.top]);
+				}
+				break;
+			}
+			case "bottom": {
+				for (var tileX = gap.start; tileX < gap.stop; ++tileX) {
+					anti_wall_list.add([tileX, chamber.bottom]);
+				}
+				break;
+			}
+		}
+		
+		chamber.gaps[$ wall] = gap;
 	}
 }
 
 function generate_chamber(direction_x, direction_y,
-	map_width_in_tiles, map_height_in_tiles, anchor_pack) {
+	map_width_in_tiles, map_height_in_tiles, anchor_pack, anti_wall_list) {
 
 	var width = irandom_range(global.min_chamber_width, global.max_chamber_width);
 	var height = irandom_range(global.min_chamber_height, global.max_chamber_height);
@@ -171,8 +205,16 @@ function generate_chamber(direction_x, direction_y,
 		chamber.right = anchor_pack.anchor_x;
 		chamber.left = chamber.right - width;
 	} else {
-		var center_of_anchor_wall = anchor_pack.anchor_x - round(width/2);
-		chamber.left = center_of_anchor_wall;
+		if (struct_exists(anchor_pack, "anchor_wall_gap") && anchor_pack.anchor_wall_gap) {
+			var center_of_anchor_wall_gap = 
+				round(anchor_pack.anchor_wall_gap.start +
+					(anchor_pack.anchor_wall_gap.length - 1)/2);
+		
+			chamber.left = round(center_of_anchor_wall_gap - height/2);
+		} else {
+			var center_of_anchor_wall = anchor_pack.anchor_x - round(width/2);
+			chamber.left = center_of_anchor_wall;			
+		}
 		chamber.right = chamber.left + width;
 	}
 
@@ -183,8 +225,17 @@ function generate_chamber(direction_x, direction_y,
 		chamber.bottom = anchor_pack.anchor_y;
 		chamber.top = chamber.bottom - height;
 	} else {
-		var center_of_anchor_wall = anchor_pack.anchor_y - round(height/2);
-		chamber.top = center_of_anchor_wall;
+		if (struct_exists(anchor_pack, "anchor_wall_gap") && anchor_pack.anchor_wall_gap) {
+			var center_of_anchor_wall_gap = 
+				round(anchor_pack.anchor_wall_gap.start +
+					(anchor_pack.anchor_wall_gap.length - 1)/2);
+		
+			//anchor_y - round(height/2);
+			chamber.top = round(center_of_anchor_wall_gap - height/2);
+		} else {
+			var center_of_anchor_wall = anchor_pack.anchor_y - round(height/2);
+			chamber.top = center_of_anchor_wall;			
+		}		
 		chamber.bottom = chamber.top + height;
 	}
 
@@ -210,11 +261,13 @@ function generate_chamber(direction_x, direction_y,
 	}
 
 	add_gaps_to_chamber(chamber, anchor_pack.anchor_wall_name, 
-		anchor_pack.anchor_wall_gap);
+		anchor_pack.anchor_wall_gap, anti_wall_list);
 	return chamber;
 }
 
-function get_anchors_for_direction(chamber, dir_name) {
+// neighbor_chamber is the chamber the current chamber is growing out of.
+// The anchors we're creating are for the current chamber.
+function get_anchors_for_direction(neighbor_chamber, dir_name) {
 	var dir = global.cardinal_dirs_by_name[$ dir_name];
 	var dir_x = dir[0];
 	var dir_y = dir[1];
@@ -224,18 +277,18 @@ function get_anchors_for_direction(chamber, dir_name) {
 	var anchor_wall_gap;
 	
 	if (dir_x != 0) {
-		anchor_x = dir_x > 0 ? chamber.right : chamber.left;
-		if (chamber.height > 4) {
-			anchor_y = irandom_range(chamber.top + 2, chamber.bottom - 2);
+		anchor_x = dir_x > 0 ? neighbor_chamber.right : neighbor_chamber.left;
+		if (neighbor_chamber.height > 4) {
+			anchor_y = irandom_range(neighbor_chamber.top + 2, neighbor_chamber.bottom - 2);
 		} else {
-			anchor_y = round((chamber.bottom - chamber.top)/2);
+			anchor_y = round((neighbor_chamber.bottom - neighbor_chamber.top)/2);
 		}
 	} else {
-		anchor_y = dir_y > 0 ? chamber.bottom : chamber.top;
-		if (chamber.width > 4) {
-			anchor_x = irandom_range(chamber.left + 2, chamber.right - 2);
+		anchor_y = dir_y > 0 ? neighbor_chamber.bottom : neighbor_chamber.top;
+		if (neighbor_chamber.width > 4) {
+			anchor_x = irandom_range(neighbor_chamber.left + 2, neighbor_chamber.right - 2);
 		} else {
-			anchor_x = round((chamber.right - chamber.left)/2);
+			anchor_x = round((neighbor_chamber.right - neighbor_chamber.left)/2);
 		}
 	}
 		
@@ -248,9 +301,14 @@ function get_anchors_for_direction(chamber, dir_name) {
 		anchor_wall_name = "bottom";
 	}
 
-	if (struct_exists(chamber.gaps, anchor_wall_name)) {
-		// We already have gaps in this wall, created by the previous chamber.
-		anchor_wall_gap = struct_get(chamber.gaps, anchor_wall_name);
+	if (struct_exists(neighbor_chamber.gaps, anchor_wall_name)) {
+		// We already have gaps in this wall, created by neighbor_chamber,
+		// so we'll sat that they should be copied to the opposite wall in the
+		// current chamber.
+		// e.g. If the anchor wall in neighbor_chamber is the right wall, that 
+		// corresponds to the left wall in the current chamber. The gaps should
+		// be reproduced there.
+		anchor_wall_gap = struct_get(neighbor_chamber.gaps, anchor_wall_name);
 		anchor_wall_name = global.opposite_wall_map[$ anchor_wall_name];
 	} else {
 		anchor_wall_gap = undefined;
@@ -263,6 +321,7 @@ function get_anchors_for_direction(chamber, dir_name) {
 function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 	var floor_tile_positions = new UniqueArray();
 	var floor_tile_index = 2
+	var anti_wall_list = new UniqueArray();
 
 	var tiles_layer = layer_get_id("Tiles_1");
 	var instances_layer = layer_get_id("Instances_1");
@@ -307,18 +366,18 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 		
 			var new_chamber = generate_chamber(dir_x, dir_y,
 				map_width_in_tiles, map_height_in_tiles,
-				anchor_pack);
+				anchor_pack, anti_wall_list);
 
 			var chamber_collides = false;
 
 			if (new_chamber == undefined) {
-				show_debug_message("<--Could not make chamber at {0}, {1} going {2}, {3}.-->",
+				show_debug_message("<!--Could not make chamber at {0}, {1} going {2}, {3}.-->",
 					anchor_pack.anchor_x, anchor_pack.anchor_y, dir_x, dir_y);
 				continue;
 			}
 
 			if (chamber_collides_with_tiles(floor_tile_positions, new_chamber)) {
-				show_debug_message("<--Chamber collides with existing tiles. {0}-->", new_chamber);
+				show_debug_message("<!--Chamber collides with existing tiles. {0}-->", new_chamber);
 				continue;
 			}
 			
@@ -367,15 +426,28 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 	""
 	}	<text x=\"{chamber.left}\" y=\"{chamber.top}\" dx=\"1\" dy=\"3\">Dir: {dir_x}, {dir_y}</text>\n{
 	""
+	}  <!-- gaps:{json_stringify(chamber.gaps)}-->\n{
+	""
 	}</g>"
 		);
 
 		record_chamber_floor_tiles_positions(floor_tile_positions, chamber);
-		draw_chamber(chamber, tile_map, floor_tile_data);
+
 		array_push(chambers, chamber);
 	}
 
-	//show_debug_message("positions: {0}", floor_tile_positions);
+	for (var i = 0; i < array_length(anti_wall_list.array); ++i) {
+		var pos = anti_wall_list.array[i];
+		show_debug_message($"<rect x=\"{pos[0]}\" y=\"{pos[1]}\" width=\"1\" height=\"1\" class=\"anti-wall\"></rect>");
+	}
+	
+	// If you draw as you go, the anti_wall_list won't be complete.
+	// So, draw after all of the chambers are generated.	
+	for (var i = 0; i < array_length(chambers); ++i) {
+		var chamber = chambers[i];
+		draw_chamber(chamber, tile_map, floor_tile_data, anti_wall_list);
+	}
+	
 	return { chambers: chambers, floor_tile_positions: floor_tile_positions };
 }
 

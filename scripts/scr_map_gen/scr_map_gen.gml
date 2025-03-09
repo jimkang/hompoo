@@ -437,17 +437,29 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 
 	// TODO: Track the taken positions.
 	var chamber_count = array_length(the_floor.chambers);
-	var start_chamber = the_floor.chambers[irandom(chamber_count - 1)];
-	// The edges of the chambers are walls.
-	var player_pos = [
-		start_chamber.left + 1 + floor((start_chamber.right - start_chamber.left - 2)/2),
-		start_chamber.top + 1 + floor((start_chamber.bottom - start_chamber.top - 2)/2)
-	];
-	show_debug_message("Player pos: {0}, {1}", player_pos[0], player_pos[1]);
-
-	// Check for
-	var garbage_pos = the_floor.floor_tile_positions.array[irandom(floor_tile_count - 1)];
-
-	instance_create_layer(player_pos[0] * global.tile_size , player_pos[1] * global.tile_size, instances_layer, obj_player);
-	instance_create_layer(garbage_pos[0] * global.tile_size, garbage_pos[1] * global.tile_size, instances_layer, obj_garbage);
+	var taken_positions = new UniqueArray();
+	var objects_to_spawn = [obj_player, obj_garbage, obj_garbage, obj_garbage,
+		obj_dancer, obj_dancer, obj_food, obj_food, obj_jammer, obj_jammer,
+		obj_word_yo, obj_word_yo];
+		
+	for (var i = 0; i < array_length(objects_to_spawn); ++i) {
+		var obj = objects_to_spawn[i];
+		var chamber;
+		var pos;
+		repeat(1000) {
+			chamber = the_floor.chambers[irandom(chamber_count - 1)];
+			// The edges of the chambers are walls.
+			pos = [
+				irandom_range(chamber.left + 1, chamber.right - 1),			
+				irandom_range(chamber.top + 1, chamber.bottom - 1)
+			];
+			if (!taken_positions.has(pos)) {
+				break;
+			}
+		}
+		show_debug_message($"{obj} pos: {pos[0]}, {pos[1]}");
+		instance_create_layer(pos[0] * global.tile_size , pos[1] * global.tile_size,
+			instances_layer, obj);
+		taken_positions.add(pos);
+	}
 }

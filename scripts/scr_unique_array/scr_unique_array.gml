@@ -14,6 +14,13 @@ function UniqueArray() constructor {
 		}
 	}
 	
+	static append = function(other_array) {
+		for (var i = 0; i < array_length(other_array); ++i) {
+			var item = other_array[i];
+			self.add(item);
+		}
+	}
+	
 	static has = function(item) {
 		var hash = variable_get_hash(json_stringify(item));
 		return struct_exists_from_hash(dict, hash);

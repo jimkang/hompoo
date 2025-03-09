@@ -116,12 +116,12 @@ function create_gap(wall, chamber) {
 	switch (wall) {
 		case "left":
 		case "right": {
-			gap.start = chamber.top + irandom(chamber.bottom - chamber.top - 1);
+			gap.start = chamber.top + 1;//+ irandom(chamber.bottom - chamber.top - 1);
 			break;
 		}
 		case "top":
 		case "bottom": {
-			gap.start = chamber.left + irandom(chamber.right - chamber.left - 1);
+			gap.start = chamber.left + 1;//irandom(chamber.right - chamber.left - 1);
 			break;
 		}
 	}
@@ -131,12 +131,16 @@ function create_gap(wall, chamber) {
 }
 
 // The gap wall assignments are wrong.
-function add_gaps_to_chamber(chamber, anti_wall_list) {
+// Gaps need to be in the coincidence of two walls.// We shouldn't be adding to the list unless we're sure that the chamber will be accepted.
+function add_gaps_to_chamber(chamber) {
 	var gap_count = choose(1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
 	var walls = [];
 	array_copy(walls, 0, array_shuffle(global.wall_names),
 		0, gap_count);
 
+	if (chamber.left == 0) {
+		show_debug_message("hey");
+	}
 	for (var i = 0; i < gap_count; ++i) {
 		var wall = walls[i];
 		
@@ -144,25 +148,29 @@ function add_gaps_to_chamber(chamber, anti_wall_list) {
 		switch (wall) {
 			case "left": {
 				for (var tileY = gap.start; tileY < gap.stop; ++tileY) {
-					anti_wall_list.add([chamber.left, tileY]);
+					show_debug_message($"<!--Adding anti-wall at {[chamber.left, tileY]} for chamber {chamber.left}, {chamber.top}.-->");
+					array_push(chamber.anti_walls, [chamber.left, tileY]);
 				}
 				break;
 			}
 			case "right": {
 				for (var tileY = gap.start; tileY < gap.stop; ++tileY) {
-					anti_wall_list.add([chamber.right, tileY]);
+					show_debug_message($"<!--Adding anti-wall at {[chamber.right, tileY]} for chamber {chamber.left}, {chamber.top}.-->");
+					array_push(chamber.anti_walls, [chamber.right, tileY]);
 				}
 				break;
 			}
 			case "top": {
 				for (var tileX = gap.start; tileX < gap.stop; ++tileX) {
-					anti_wall_list.add([tileX, chamber.top]);
+					show_debug_message($"<!--Adding anti-wall at {[tileX, chamber.top]} for chamber {chamber.left}, {chamber.top}.-->");
+					array_push(chamber.anti_walls, [tileX, chamber.top]);
 				}
 				break;
 			}
 			case "bottom": {
 				for (var tileX = gap.start; tileX < gap.stop; ++tileX) {
-					anti_wall_list.add([tileX, chamber.bottom]);
+					show_debug_message($"<!--Adding anti-wall at {[tileX, chamber.bottom]} for chamber {chamber.left}, {chamber.top}.-->");
+					array_push(chamber.anti_walls, [tileX, chamber.bottom]);
 				}
 				break;
 			}
@@ -179,7 +187,8 @@ function generate_chamber(direction_x, direction_y,
 	// These are outer width and height. They do include the walls.
 	var chamber = {
 		width: width,
-		height: height
+		height: height,
+		anti_walls: []
 	};
 
 	if (direction_x > 0) {
@@ -244,7 +253,7 @@ function generate_chamber(direction_x, direction_y,
 		return;
 	}
 
-	add_gaps_to_chamber(chamber, anti_wall_list);
+	add_gaps_to_chamber(chamber);
 	return chamber;
 }
 
@@ -387,6 +396,8 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 		record_chamber_floor_tiles_positions(floor_tile_positions, chamber);
 
 		array_push(chambers, chamber);
+		// Once we know the chamber is good, we can consider its anti-walls to be good.
+		anti_wall_list.append(chamber.anti_walls);
 	}
 
 	for (var i = 0; i < array_length(anti_wall_list.array); ++i) {

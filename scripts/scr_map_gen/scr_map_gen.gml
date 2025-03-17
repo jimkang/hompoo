@@ -440,8 +440,9 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 	var taken_positions = new UniqueArray();
 	var objects_to_spawn = [obj_player, obj_garbage, obj_garbage, obj_garbage,
 		obj_dancer, obj_dancer, obj_food, obj_food, obj_jammer, obj_jammer,
-		obj_word_yo, obj_word_yo];
-		
+		obj_word_yo, obj_word_yo, obj_box, obj_box, obj_box,obj_box, obj_box];
+	// TODO: Do things chamber by chamber.
+	// TODO: Change box dimensions.
 	for (var i = 0; i < array_length(objects_to_spawn); ++i) {
 		var obj = objects_to_spawn[i];
 		var chamber;

@@ -464,7 +464,7 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 		var inst = instance_create_layer(pos[0] * global.tile_size , pos[1] * global.tile_size,
 			instances_layer, obj);
 		if (obj == obj_box) {
-			inst.image_xscale = 2;
+			inst.set_image_xscale(2);
 		}
 		
 		taken_positions.add(pos);

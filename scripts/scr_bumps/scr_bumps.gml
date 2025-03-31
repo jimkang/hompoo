@@ -13,6 +13,7 @@ function scr_bumps(bumper) {
 		}
 		
 		if (colliding_inst.pushable) {
+			show_debug_message("Pushing {0}", object_get_name(colliding_inst.object_index));
 			colliding_inst.x += (bumper.x - bumper.xprevious);
 			colliding_inst.y += (bumper.y - bumper.yprevious);
 		} else {

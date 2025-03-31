@@ -36,6 +36,7 @@
   "name":"hompoo",
   "resources":[
     {"id":{"name":"Serif","path":"fonts/Serif/Serif.yy",},},
+    {"id":{"name":"obj_box_bottom_wall","path":"objects/obj_box_bottom_wall/obj_box_bottom_wall.yy",},},
     {"id":{"name":"obj_box_top_wall","path":"objects/obj_box_top_wall/obj_box_top_wall.yy",},},
     {"id":{"name":"obj_box","path":"objects/obj_box/obj_box.yy",},},
     {"id":{"name":"obj_collision_parent","path":"objects/obj_collision_parent/obj_collision_parent.yy",},},
@@ -58,6 +59,7 @@
     {"id":{"name":"scr_item","path":"scripts/scr_item/scr_item.yy",},},
     {"id":{"name":"scr_map_gen","path":"scripts/scr_map_gen/scr_map_gen.yy",},},
     {"id":{"name":"scr_unique_array","path":"scripts/scr_unique_array/scr_unique_array.yy",},},
+    {"id":{"name":"spr_box_bottom_wall","path":"sprites/spr_box_bottom_wall/spr_box_bottom_wall.yy",},},
     {"id":{"name":"spr_box_lid","path":"sprites/spr_box_lid/spr_box_lid.yy",},},
     {"id":{"name":"spr_box_top_wall","path":"sprites/spr_box_top_wall/spr_box_top_wall.yy",},},
     {"id":{"name":"spr_dancer","path":"sprites/spr_dancer/spr_dancer.yy",},},

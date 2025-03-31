@@ -300,7 +300,8 @@ function get_anchors_for_direction(neighbor_chamber, dir_name) {
 
 function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 	var floor_tile_positions = new UniqueArray();
-	var floor_tile_index = 2
+	var floor_tile_index = 2;
+	var room_count = 1;
 	var anti_wall_list = new UniqueArray();
 
 	var tiles_layer = layer_get_id("Tiles_1");
@@ -322,7 +323,7 @@ function generate_floor(map_width_in_tiles, map_height_in_tiles) {
 	};
 	var chamber = undefined;
 
-	for (var i = 0; i < 10; ++i) {
+	for (var i = 0; i < room_count; ++i) {
 		var valid_dir_names = array_shuffle(struct_get_names(global.cardinal_dirs_by_name));
 		var dir_name = undefined;
 		
@@ -438,10 +439,11 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 	// TODO: Track the taken positions.
 	var chamber_count = array_length(the_floor.chambers);
 	var taken_positions = new UniqueArray();
-	var objects_to_spawn = [obj_player, obj_garbage, obj_garbage, obj_garbage,
-		obj_dancer, obj_dancer, obj_food, obj_food, obj_jammer, obj_jammer,
-		obj_word_yo, obj_word_yo, obj_box, obj_box, obj_box, obj_box, obj_box,
-		obj_box, obj_box, obj_box, obj_box, obj_box];
+	//var objects_to_spawn = [obj_player, obj_garbage, obj_garbage, obj_garbage,
+	//	obj_dancer, obj_dancer, obj_food, obj_food, obj_jammer, obj_jammer,
+	//	obj_word_yo, obj_word_yo, obj_box, obj_box, obj_box, obj_box, obj_box,
+	//	obj_box, obj_box, obj_box, obj_box, obj_box];
+	var objects_to_spawn = [obj_player, obj_box];
 	// TODO: Do things chamber by chamber.
 	// TODO: Change box dimensions.
 	for (var i = 0; i < array_length(objects_to_spawn); ++i) {
@@ -464,7 +466,8 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 		var inst = instance_create_layer(pos[0] * global.tile_size , pos[1] * global.tile_size,
 			instances_layer, obj);
 		if (obj == obj_box) {
-			inst.set_image_xscale(2);
+			inst.set_image_xscale(1.5); 
+			inst.set_image_yscale(2);
 		}
 		
 		taken_positions.add(pos);

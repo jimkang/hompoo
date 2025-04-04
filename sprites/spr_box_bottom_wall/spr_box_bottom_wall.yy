@@ -24,7 +24,7 @@
   "name":"spr_box_bottom_wall",
   "nineSlice":{
     "$GMNineSliceData":"",
-    "bottom":2,
+    "bottom":4,
     "enabled":true,
     "guideColour":[4294902015,4294902015,4294902015,4294902015,],
     "highlightColour":1728023040,
@@ -40,7 +40,7 @@
       0,
       0,
     ],
-    "top":2,
+    "top":4,
   },
   "origin":0,
   "parent":{

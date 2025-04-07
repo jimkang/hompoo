@@ -34,8 +34,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_box_top_wall",
-    "path":"sprites/spr_box_top_wall/spr_box_top_wall.yy",
+    "name":"spr_box_bottom_wall",
+    "path":"sprites/spr_box_bottom_wall/spr_box_bottom_wall.yy",
   },
   "spriteMaskId":null,
   "visible":true,

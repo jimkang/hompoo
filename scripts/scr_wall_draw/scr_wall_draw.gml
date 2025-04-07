@@ -1,11 +1,12 @@
 function draw_vertical_wall(wall_obj) {
+	
 	var non_stretchable_part_height = 8;
 
 	var spr = object_get_sprite(wall_obj.object_index);
 	
-	var src_height = sprite_get_height(spr) - 2 * non_stretchable_part_height;
+	var middle_src_height = sprite_get_height(spr) - 2 * non_stretchable_part_height;
 	var desired_height = wall_obj.sprite_height - 2 * non_stretchable_part_height;
-	var y_scale = desired_height/src_height;
+	var y_scale = desired_height/middle_src_height;
 	//show_debug_message("src_height {0}, desired_height {1}, y_scale {2}",
 	//	src_height, desired_height, y_scale);
 
@@ -16,7 +17,7 @@ function draw_vertical_wall(wall_obj) {
 		0,	
 		non_stretchable_part_height,
 		sprite_get_width(spr),
-		src_height,
+		middle_src_height,
 	
 		// Where to draw and at what scale.
 		x,
@@ -28,7 +29,46 @@ function draw_vertical_wall(wall_obj) {
 		1
 	);
 	
-	// TODO: Draw corners.
+	// Top corner.
+	draw_sprite_part_ext(spr,
+		-1,
+
+		// Source from image to draw.
+		0,
+		0,
+		sprite_get_width(spr),
+		non_stretchable_part_height,
+	
+		// Where to draw and at what scale.
+		x,
+		y,
+		1,
+		1,
+
+		c_white,
+		1
+	);
+	
+	
+	// Bottom corner.
+	draw_sprite_part_ext(spr,
+		-1,
+
+		// Source from image to draw.
+		0,
+		sprite_get_height(spr) - non_stretchable_part_height,
+		sprite_get_width(spr),
+		non_stretchable_part_height,
+	
+		// Where to draw and at what scale.
+		x,
+		y + wall_obj.sprite_height - non_stretchable_part_height,
+		1,
+		1,
+
+		c_white,
+		1
+	);
 }
 
 function draw_horizontal_wall(wall_obj) {

@@ -3,7 +3,13 @@ self.bottom_wall = instance_create_layer(self.x, self.y, self.layer, obj_box_bot
 self.left_wall = instance_create_layer(self.x, self.y, self.layer, obj_box_left_wall);
 self.right_wall = instance_create_layer(self.x, self.y, self.layer, obj_box_right_wall);
 
-self.attached_things = [self.top_wall, self.bottom_wall, self.left_wall, self.right_wall];
+thing_init(self);
+
+self.attached_things = [];
+attach_thing(self, self.top_wall);
+attach_thing(self, self.bottom_wall);
+attach_thing(self, self.left_wall);
+attach_thing(self, self.right_wall);
 
 self.set_image_yscale = function(scale) {
 	self.image_yscale = scale;

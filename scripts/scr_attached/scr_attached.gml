@@ -17,3 +17,9 @@ function scr_bring_attached_things(inst) {
 		}
 	}
 }
+
+function attach_thing(inst, thing) {
+	thing.is_attachment = true;
+	thing.attached_to = weak_ref_create(inst);
+	array_push(inst.attached_things, thing);
+}

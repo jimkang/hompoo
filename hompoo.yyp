@@ -60,6 +60,7 @@
     {"id":{"name":"scr_init","path":"scripts/scr_init/scr_init.yy",},},
     {"id":{"name":"scr_item","path":"scripts/scr_item/scr_item.yy",},},
     {"id":{"name":"scr_map_gen","path":"scripts/scr_map_gen/scr_map_gen.yy",},},
+    {"id":{"name":"scr_thing_init","path":"scripts/scr_thing_init/scr_thing_init.yy",},},
     {"id":{"name":"scr_unique_array","path":"scripts/scr_unique_array/scr_unique_array.yy",},},
     {"id":{"name":"scr_wall_draw","path":"scripts/scr_wall_draw/scr_wall_draw.yy",},},
     {"id":{"name":"spr_box_bottom_wall","path":"sprites/spr_box_bottom_wall/spr_box_bottom_wall.yy",},},

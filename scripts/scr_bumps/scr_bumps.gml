@@ -5,9 +5,18 @@ function scr_bumps(bumper) {
 	// Look for collision with instances of obj_collision_parent.
 	var colliding_inst = instance_place(bumper.x, bumper.y, [obj_collision_parent]);
 	if (colliding_inst) {
+		if (colliding_inst.is_attachment) {
+			// Collide with the parent of the attachment instead of the attachment.
+			if (weak_ref_alive(colliding_inst.attached_to)) {
+				show_debug_message("Collided with attachment {0}", colliding_inst);
+				colliding_inst = colliding_inst.attached_to.ref;
+			}
+		}
+		
 		if (colliding_inst.is_item) {
 			//show_debug_message("It is an item!");
-			if (item_take(bumper, colliding_inst)) {
+			// TODO: If items ever have attachments, this needs to work on colliding_inst.attached_things.
+			if (item_take(bumper, colliding_inst)) {				
 				return;
 			}
 		}

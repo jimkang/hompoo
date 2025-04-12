@@ -26,3 +26,7 @@ self.set_image_xscale = function(scale) {
 	self.top_wall.image_xscale = scale;
 	self.bottom_wall.image_xscale = scale;
 }
+
+self.open = function() {
+	show_debug_message("Box opening!");
+}

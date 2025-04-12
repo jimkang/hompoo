@@ -8,7 +8,7 @@ function scr_bumps(bumper) {
 		if (struct_exists(colliding_inst, "is_attachment") && colliding_inst.is_attachment) {
 			// Collide with the parent of the attachment instead of the attachment.
 			if (weak_ref_alive(colliding_inst.attached_to)) {
-				show_debug_message("Collided with attachment {0}", colliding_inst);
+				//show_debug_message("Collided with attachment {0}", colliding_inst);
 				colliding_inst = colliding_inst.attached_to.ref;
 			}
 		}
@@ -22,7 +22,7 @@ function scr_bumps(bumper) {
 		}
 		
 		if (colliding_inst.pushable) {
-			show_debug_message("Pushing {0}", object_get_name(colliding_inst.object_index));
+			//show_debug_message("Pushing {0}", object_get_name(colliding_inst.object_index));
 			colliding_inst.x += (bumper.x - bumper.xprevious);
 			colliding_inst.y += (bumper.y - bumper.yprevious);
 		} else {

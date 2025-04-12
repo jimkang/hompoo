@@ -5,7 +5,7 @@ function scr_bumps(bumper) {
 	// Look for collision with instances of obj_collision_parent.
 	var colliding_inst = instance_place(bumper.x, bumper.y, [obj_collision_parent]);
 	if (colliding_inst) {
-		if (colliding_inst.is_attachment) {
+		if (struct_exists(colliding_inst, "is_attachment") && colliding_inst.is_attachment) {
 			// Collide with the parent of the attachment instead of the attachment.
 			if (weak_ref_alive(colliding_inst.attached_to)) {
 				show_debug_message("Collided with attachment {0}", colliding_inst);

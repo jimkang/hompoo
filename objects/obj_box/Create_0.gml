@@ -29,4 +29,11 @@ self.set_image_xscale = function(scale) {
 
 self.open = function() {
 	show_debug_message("Box opening!");
+	// TODO: Which wall are opening?
+	detach_thing(self, self.right_wall);
+	self.right_wall.x += 10;
+	detach_thing(self, self.left_wall);
+	detach_thing(self, self.top_wall);
+	detach_thing(self, self.bottom_wall);
+	instance_destroy(self);
 }

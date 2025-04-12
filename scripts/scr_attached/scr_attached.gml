@@ -23,3 +23,9 @@ function attach_thing(inst, thing) {
 	thing.attached_to = weak_ref_create(inst);
 	array_push(inst.attached_things, thing);
 }
+
+function detach_thing(inst, thing) {
+	thing.is_attachment = false;
+	thing.attached_to = undefined;
+	array_remove(inst.attached_things, thing);
+}

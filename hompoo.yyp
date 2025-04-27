@@ -57,6 +57,7 @@
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
     {"id":{"name":"scr_attached","path":"scripts/scr_attached/scr_attached.yy",},},
     {"id":{"name":"scr_bumps","path":"scripts/scr_bumps/scr_bumps.yy",},},
+    {"id":{"name":"scr_drift","path":"scripts/scr_drift/scr_drift.yy",},},
     {"id":{"name":"scr_init","path":"scripts/scr_init/scr_init.yy",},},
     {"id":{"name":"scr_item","path":"scripts/scr_item/scr_item.yy",},},
     {"id":{"name":"scr_map_gen","path":"scripts/scr_map_gen/scr_map_gen.yy",},},

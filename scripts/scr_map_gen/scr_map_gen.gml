@@ -468,6 +468,10 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 		if (obj == obj_box) {
 			inst.set_image_xscale(1.5);
 			inst.set_image_yscale(5);
+			// TODO: Abstract set up
+			var inside_item = instance_create_layer(inst.x, inst.y,
+				instances_layer, obj_garbage);
+			inst.put_inside(inside_item);
 		}
 		
 		taken_positions.add(pos);

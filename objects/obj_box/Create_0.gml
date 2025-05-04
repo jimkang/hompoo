@@ -37,3 +37,7 @@ self.open = function() {
 	detach_thing(self, self.bottom_wall);
 	instance_destroy(self);
 }
+
+self.put_inside = function(thing) {
+	attach_thing(self, thing);
+}

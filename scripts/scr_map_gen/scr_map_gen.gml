@@ -443,7 +443,7 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 	//	obj_dancer, obj_dancer, obj_food, obj_food, obj_jammer, obj_jammer,
 	//	obj_word_yo, obj_word_yo, obj_box, obj_box, obj_box, obj_box, obj_box,
 	//	obj_box, obj_box, obj_box, obj_box, obj_box];
-	var objects_to_spawn = [obj_player, obj_box];
+	var objects_to_spawn = [obj_player, obj_box, obj_box_left_wall];
 	// TODO: Do things chamber by chamber.
 	// TODO: Change box dimensions.
 	for (var i = 0; i < array_length(objects_to_spawn); ++i) {
@@ -457,14 +457,22 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 				irandom_range(chamber.left + 1, chamber.right - 1),			
 				irandom_range(chamber.top + 1, chamber.bottom - 1)
 			];
+			if (obj == obj_box_left_wall) {
+				pos = [65, 62];
+			}
 			if (!taken_positions.has(pos)) {
 				break;
 			}
 		}
 		show_debug_message($"{obj} pos: {pos[0]}, {pos[1]}");
 		
-		var inst = instance_create_layer(pos[0] * global.tile_size , pos[1] * global.tile_size,
-			instances_layer, obj);
+		var inst = instance_create_layer(
+			pos[0] * global.tile_size,
+			pos[1] * global.tile_size,
+			instances_layer,
+			obj
+		);
+		
 		if (obj == obj_box) {
 			inst.set_image_xscale(1.5);
 			inst.set_image_yscale(5);
@@ -472,6 +480,9 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 			var inside_item = instance_create_layer(inst.x, inst.y,
 				instances_layer, obj_garbage);
 			inst.put_inside(inside_item);
+		}
+		if (obj == obj_box_left_wall) {
+			inst.image_yscale = 5;
 		}
 		
 		taken_positions.add(pos);

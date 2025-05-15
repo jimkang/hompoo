@@ -25,9 +25,10 @@ function scr_bumps(bumper) {
 			//show_debug_message("Pushing {0}", object_get_name(colliding_inst.object_index));
 			colliding_inst.x += (bumper.x - bumper.xprevious);
 			colliding_inst.y += (bumper.y - bumper.yprevious);
-		} else {
-			bumper.x = bumper.xprevious;
-			bumper.y = bumper.yprevious;
+			return;
 		}
+		
+		bumper.x = bumper.xprevious;
+		bumper.y = bumper.yprevious;
 	}
 }

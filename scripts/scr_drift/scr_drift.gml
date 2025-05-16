@@ -1,3 +1,6 @@
+//function close_to(value, target, tolerance) {
+//	return abs(value - target) <= tolerance;
+//}
 
 function drift() {
 	function start(xDeltaPerStep, yDeltaPerStep, goalDriftX, goalDriftY) {
@@ -6,6 +9,8 @@ function drift() {
 		self.goalDriftX = goalDriftX;
 		self.goalDriftY = goalDriftY;
 		self.stopped = false;
+		self.dirX = get_direction(self.xDeltaPerStep);
+		self.dirY = get_direction(self.yDeltaPerStep);
 	}
 	
 	function step(drifter) {
@@ -18,7 +23,9 @@ function drift() {
 		drifter.y += self.yDeltaPerStep;
 		self.driftedX += self.xDeltaPerStep;
 		self.driftedY += self.yDeltaPerStep;
-		if (self.driftedX >= self.goalDriftX && self.driftedY >= self.goalDriftY) {
+		if ((self.dirX > 0 ? self.driftedX >= self.goalDriftX : self.driftedX <= self.goalDriftX) &&
+			(self.dirY > 0 ? self.driftedY >= self.goalDriftY : self.driftedY <= self.goalDriftY)) {
+		
 			self.stopped = true;
 		}
 	}
@@ -33,6 +40,8 @@ function drift() {
 		"count": 0,
 		"stopped": true,
 		"step": step,
-		"start": start
+		"start": start,
+		"dirX": 0,
+		"dirY": 0
 	}
 }

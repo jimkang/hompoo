@@ -3,8 +3,7 @@ spr_index = spr_hompoo_down
 
 self.bag = []
 self.wants_types = ["word"];
-
-
+self.pushable = true;
 self.listener = instance_create_layer(self.x, self.y, self.layer, obj_listener);
 self.listener.receiver = function(speech) {
 	//show_debug_message("Link heard:" + speech);

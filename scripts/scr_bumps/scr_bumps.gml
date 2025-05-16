@@ -62,18 +62,23 @@ function check_bump_at_pos(x1, y1, x2, y2, xDelta, yDelta, bumper, excluded_ids)
 		var nextX = colliding_inst.x + xDelta;
 		var nextY = colliding_inst.y + yDelta;
 		var next_outcome = check_bump_at_pos(
-			// Why is this colliding with the same colliding_inst?
 			nextX,
 			nextY,
 			// sprite_width already has the scale applied to it.
-			nextX + bumper.sprite_width,
-			nextY + bumper.sprite_height,
+			nextX + colliding_inst.sprite_width,
+			nextY + colliding_inst.sprite_height,
 			xDelta,
 			yDelta,
 			colliding_inst,
 			excluded_ids
 		);
 
+		if (next_outcome.directive == BumpDirective.push) {
+			return {
+				directive: BumpDirective.push,
+				bumped: array_concat([colliding_inst], next_outcome.bumped)
+			};
+		}
 		if (next_outcome.directive != BumpDirective.clear) {
 			return {
 				directive: BumpDirective.blocked,

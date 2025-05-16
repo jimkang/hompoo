@@ -458,7 +458,7 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 				irandom_range(chamber.top + 1, chamber.bottom - 1)
 			];
 			if (obj == obj_box_left_wall) {
-				pos = [65, 62];
+				pos = [70, 60];
 			}
 			if (!taken_positions.has(pos)) {
 				break;

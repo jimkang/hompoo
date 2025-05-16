@@ -5,21 +5,11 @@ enum BumpDirective {
 	push
 };
 
-function get_direction(n) {
-	if (n == 0) {
-		return 0;
-	}
-	if (n > 0) {
-		return 1;
-	}
-	return -1;
-}
-
 function get_id(inst) {
 	return inst.id;
 }
 
-function check_bump_at_pos(x1, y1, x2, y2, xDelta, yDelta, bumper) {
+function check_bump_at_pos(x1, y1, x2, y2, xDelta, yDelta, bumper, excluded_ids) {
 	// Look for collision with instances of obj_collision_parent.
 	var col_list = ds_list_create();
 	var col_count = collision_rectangle_list(
@@ -33,7 +23,7 @@ function check_bump_at_pos(x1, y1, x2, y2, xDelta, yDelta, bumper) {
 	);
 		
 	var colliding_inst = undefined;
-	var excluded_ids = [bumper.id];
+	array_push(excluded_ids, bumper.id);
 	
 	if (variable_instance_exists(bumper, "attached_things")) {
 		excluded_ids = array_concat(
@@ -80,7 +70,8 @@ function check_bump_at_pos(x1, y1, x2, y2, xDelta, yDelta, bumper) {
 			nextY + bumper.sprite_height,
 			xDelta,
 			yDelta,
-			colliding_inst
+			colliding_inst,
+			excluded_ids
 		);
 
 		if (next_outcome.directive != BumpDirective.clear) {
@@ -111,7 +102,8 @@ function scr_bumps(bumper) {
 		bumper.y + bumper.sprite_height,
 		bumper.x - bumper.xprevious,
 		bumper.y - bumper.yprevious,
-		bumper
+		bumper,
+		[]
 	);
 
 	if (bumpOutcome.directive == BumpDirective.blocked) {

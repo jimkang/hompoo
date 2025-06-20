@@ -112,8 +112,15 @@ function scr_bumps(bumper) {
 	);
 
 	if (bumpOutcome.directive == BumpDirective.blocked) {
-		bumper.x = bumper.xprevious;
-		bumper.y = bumper.yprevious;
+		var xDelta = abs(bumper.x - bumper.xprevious);
+		var yDelta = abs(bumper.y - bumper.yprevious);
+		// Back up only on the axes that the bumper was "intentionally" moving.
+		if (xDelta > global.centering_adjust_rate) {
+			bumper.x = bumper.xprevious;
+		}
+		if (yDelta > global.centering_adjust_rate) {
+			bumper.y = bumper.yprevious;
+		}
 	} else if (bumpOutcome.directive == BumpDirective.hitItem) {
 		// TODO: If items ever have attachments, this needs to work on
 		// colliding_inst.attached_things.

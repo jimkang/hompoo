@@ -128,7 +128,7 @@ function scr_bumps(bumper) {
 			if (!item_take(bumper, bumpOutcome.bumped[i])) {				
 				show_debug_message("Could not take item!");
 			}
-		}		
+		}
 	} else if (bumpOutcome.directive == BumpDirective.push) {
 		var deltaX = bumper.x - bumper.xprevious;
 		var deltaY = bumper.y - bumper.yprevious;

@@ -31,7 +31,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.1400.0.826",
+    "IDEVersion":"2024.1400.0.841",
   },
   "name":"hompoo",
   "resources":[
@@ -51,6 +51,7 @@
     {"id":{"name":"obj_player","path":"objects/obj_player/obj_player.yy",},},
     {"id":{"name":"obj_rock_a","path":"objects/obj_rock_a/obj_rock_a.yy",},},
     {"id":{"name":"obj_speaker","path":"objects/obj_speaker/obj_speaker.yy",},},
+    {"id":{"name":"obj_tourist","path":"objects/obj_tourist/obj_tourist.yy",},},
     {"id":{"name":"obj_word_yo","path":"objects/obj_word_yo/obj_word_yo.yy",},},
     {"id":{"name":"pth_test","path":"paths/pth_test/pth_test.yy",},},
     {"id":{"name":"room_init","path":"rooms/room_init/room_init.yy",},},

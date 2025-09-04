@@ -443,9 +443,10 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 	//	obj_dancer, obj_dancer, obj_food, obj_food, obj_jammer, obj_jammer,
 	//	obj_word_yo, obj_word_yo, obj_box, obj_box, obj_box, obj_box, obj_box,
 	//	obj_box, obj_box, obj_box, obj_box, obj_box];
-	var objects_to_spawn = [obj_player, obj_box, obj_box_left_wall];
+	var objects_to_spawn = [obj_player, obj_box, obj_box_left_wall, obj_box];
 	// TODO: Do things chamber by chamber.
 	// TODO: Change box dimensions.
+	var box_count = 0;
 	for (var i = 0; i < array_length(objects_to_spawn); ++i) {
 		var obj = objects_to_spawn[i];
 		var chamber;
@@ -474,12 +475,22 @@ function scr_map_gen(map_width_in_tiles, map_height_in_tiles) {
 		);
 		
 		if (obj == obj_box) {
-			inst.set_image_xscale(1.5);
-			inst.set_image_yscale(5);
-			// TODO: Abstract set up
-			var inside_item = instance_create_layer(inst.x, inst.y,
-				instances_layer, obj_garbage);
-			inst.put_inside(inside_item);
+			if (box_count == 0) {
+				inst.set_image_xscale(1.5);
+				inst.set_image_yscale(5);
+				// TODO: Abstract set up
+				var inside_item = instance_create_layer(inst.x, inst.y,
+					instances_layer, obj_garbage);
+				inst.put_inside(inside_item);
+			} else {
+				inst.set_image_xscale(2.5);
+				inst.set_image_yscale(2);
+				
+				var inside_item = instance_create_layer(inst.x, inst.y,
+					instances_layer, obj_dancer);
+				inst.put_inside(inside_item);
+			}
+			box_count += 1;
 		}
 		if (obj == obj_box_left_wall) {
 			inst.image_yscale = 5;

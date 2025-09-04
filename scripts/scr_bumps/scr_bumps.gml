@@ -5,6 +5,8 @@ enum BumpDirective {
 	push
 };
 
+global.centering_adjust_rate = 1;
+
 function get_id(inst) {
 	return inst.id;
 }
@@ -96,9 +98,9 @@ function check_bump_at_pos(x1, y1, x2, y2, xDelta, yDelta, bumper, excluded_ids)
 }
 
 function scr_bumps(bumper) {
-	if (bumper.x == bumper.xprevious && bumper.y == bumper.yprevious) {
-		return;
-	}
+	//if (bumper.x == bumper.xprevious && bumper.y == bumper.yprevious) {
+	//	return;
+	//}
 
 	var bumpOutcome = check_bump_at_pos(
 		bumper.x,
@@ -138,4 +140,6 @@ function scr_bumps(bumper) {
 			bumpOutcome.bumped[i].y += deltaY;
 		}
 	}
+	
+	return bumpOutcome;
 }

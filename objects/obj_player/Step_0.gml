@@ -1,5 +1,4 @@
 //event_inherited();
-global.centering_adjust_rate = 1;
 
 // centering_axis should be "x" or "y".
 function nudge_toward_tile_center(centering_axis) {
@@ -34,3 +33,7 @@ if (keyboard_check(vk_down)) {
 }
 
 scr_bumps(self);
+
+if (self.hp < 1) {
+	instance_destroy(self);
+}
